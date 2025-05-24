@@ -1,7 +1,6 @@
 # ninxsh - A Custom Unix Shell
 
 ![LICENSE](https://img.shields.io/badge/license-MIT-green.svg)
-<!-- ![Build](https://img.shields.io/github/actions/workflow/status/AarambhaAnta/ninxsh/Makefile) -->
 ![Last Commit](https://img.shields.io/github/last-commit/AarambhaAnta/ninxsh)
 ![Language](https://img.shields.io/github/languages/top/AarambhaAnta/ninxsh)
 ![Stars](https://img.shields.io/github/stars/AarambhaAnta/ninxsh?style=social)
