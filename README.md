@@ -1,6 +1,12 @@
 # ninxsh - A Custom Unix Shell
 
-ninxsh is a lightweight shell written in C++. It supports:
+![LICENSE](https://img.shields.io/badge/license-MIT-green.svg)
+<!-- ![Build](https://img.shields.io/github/actions/workflow/status/AarambhaAnta/ninxsh/Makefile) -->
+![Last Commit](https://img.shields.io/github/last-commit/AarambhaAnta/ninxsh)
+![Language](https://img.shields.io/github/languages/top/AarambhaAnta/ninxsh)
+![Stars](https://img.shields.io/github/stars/AarambhaAnta/ninxsh?style=social)
+
+`ninxsh` is a lightweight shell written in modern C++. It supports:
 
 - REPL prompt
 - Builtin Commands (`exit`, `echo`, `cd`, etc.)
