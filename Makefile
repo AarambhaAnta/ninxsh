@@ -1,10 +1,13 @@
 CXX = g++
 CXXFLAGS = -std=c++17 -Wall -Wextra -I include/
-SRC = src/main.cpp src/shell.cpp
-OUT = ninxsh
+SRC = $(wildcard src/*.cpp)
+OBJ = $(SRC:.cpp=.o)
+BIN = ninxsh
 
-all:
-	$(CXX) $(CXXFLAGS) $(SRC) -o $(OUT)
+all: $(BIN)
+
+$(BIN): $(SRC)
+	$(CXX) $(CXXFLAGS) -o $@ $^
 
 clean:
-	rm -f $(OUT)
+	rm -f $(BIN) src/*.o
