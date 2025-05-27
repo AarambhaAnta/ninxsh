@@ -34,8 +34,8 @@ make clean  # To delete the binary
 ## Deliverables at the End of **Day 2**
 
 - [x] Run external commands using `fork()` and `execvp()`
-- [ ] Supports basic Unix commands like `ls`, `pwd`, `echo`, `date`, etc.
-- [ ] Basic error handling for invalid commands (shows "command not found")
-- [ ] Robust input tokenization and conversion to C-style argument arrays
-- [ ] Handles command execution filure gracefully without crashing
-- [ ] Proper memory management with `strdup()` and `free()`
+- [x] Supports basic Unix commands like `ls`, `pwd`, `echo`, `date`, etc.
+- [x] Basic error handling for invalid commands (shows "command not found")
+- [x] Robust input tokenization and conversion to C-style argument arrays
+- [x] Handles command execution filure gracefully without crashing
+- [x] Proper memory management with `strdup()` and `free()`
