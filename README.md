@@ -9,9 +9,9 @@
 
 - REPL prompt
 - Builtin Commands (`exit`, `echo`, `cd`, etc.)
-- External executable support
-- Command history
-- Quoting, redirection & pipelines
+- External executable support using `fork()` and `execvp()`
+- Command history (planned)
+- Quoting, redirection & pipelines (planned)
 
 ## Build Instructions
 
@@ -30,3 +30,12 @@ make clean  # To delete the binary
 - [x] Reads user input
 - [x] Gracefully handles empty input and `Ctrl + C` (EOF)
 - [x] Initial commits in Git
+
+## Deliverables at the End of **Day 2**
+
+- [x] Run external commands using `fork()` and `execvp()`
+- [ ] Supports basic Unix commands like `ls`, `pwd`, `echo`, `date`, etc.
+- [ ] Basic error handling for invalid commands (shows "command not found")
+- [ ] Robust input tokenization and conversion to C-style argument arrays
+- [ ] Handles command execution filure gracefully without crashing
+- [ ] Proper memory management with `strdup()` and `free()`
