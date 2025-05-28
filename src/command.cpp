@@ -1,4 +1,5 @@
 #include "command.hpp"
+#include "builtin.hpp"
 #include <sstream>
 #include <vector>
 #include <string>
@@ -21,4 +22,8 @@ std::vector<char*> tokenize(const std::string& input){
     argv.push_back(nullptr);
 
     return argv;
+}
+
+bool isBuiltin(const std::string &cmd){
+    return cmd == "exit" || cmd == "clear" || cmd == "cd";
 }
