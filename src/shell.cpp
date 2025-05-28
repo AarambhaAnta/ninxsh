@@ -1,5 +1,7 @@
 #include "shell.hpp"
 #include "command.hpp"
+#include "builtin.hpp"
+
 #include <iostream>
 #include <string>
 #include <unistd.h>
@@ -14,30 +16,43 @@ void Shell::run()
         printPrompt();
         std::getline(std::cin, input);
 
-        // Exit structures
+        // Handle EOF (Ctrl + C)
         if (std::cin.eof())
-        { /* Ctrl+C */
-            std::cout << '\n';
-            break;
-        }
-        if (input == "exit")
         {
             std::cout << '\n';
             break;
         }
 
+        // Skip empty input
         if (input.empty())
             continue;
 
-        // child creation
+        // Tokenize input into argv
+        std::vector<char *> argv = tokenize(input);
+        if(argv.empty()){
+            continue;
+        }
+
+        std::string cmd = argv[0];
+
+        // Check for builtin
+        if(isBuiltin(cmd)){
+            executeBuiltin(argv);
+            // Free all arguments
+            for(char *arg : argv){
+                free(arg);
+            }
+            continue; // Skip external command execution for builtins
+        }
+
+        // External Commands
         pid_t pid = fork();
-        if(pid<0){
+        if (pid < 0)
+        {
             std::cerr << "ninxsh: fork failed\n";
             continue;
         }
 
-        // argument tokenization
-        std::vector<char *> argv = tokenize(input);
         // command run
         if(pid==0){
             if(execvp(argv[0],argv.data())==-1){
@@ -47,9 +62,10 @@ void Shell::run()
         }else{
             int status;
             waitpid(pid, &status, 0);
-            for(char* arg : argv){
-                free(arg);
-            }
+        }
+        // Free all arguments after external command execution
+        for(char* arg : argv){
+            free(arg);
         }
 
     }
