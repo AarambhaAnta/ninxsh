@@ -45,6 +45,15 @@ ninxsh/
 └── .gitignore
 ```
 
+> To generate the initial project structure:
+
+```bash
+mkdir -p ninxsh/src ninxsh/include \
+&& touch ninxsh/src/{main.cpp,shell.cpp,command.cpp,executor.cpp,builtin.cpp,utils.cpp,history.cpp} \
+&& touch ninxsh/include/{shell.hpp,command.hpp,executor.hpp,builtins.hpp,util.hpp,history.hpp} \
+&& touch ninxsh/Makefile ninxsh/README.md ninxsh/.gitignore
+```
+
 ---
 
 ## Progress Roadmap
