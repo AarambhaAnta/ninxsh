@@ -21,9 +21,35 @@ make        # To build ninxsh
 make clean  # To delete the binary
 ```
 
+## Project Structure
+
+```bash
+ninxsh/
+├── src/
+│   ├── main.cpp        # Main loop
+│   ├── shell.cpp       # Shell class logic
+│   ├── command.cpp     # Tokenization
+│   ├── executor.cpp    # External execution logic
+│   ├── builtin.cpp     # Built-in command handlers
+│   ├── utils.cpp       # Misc utilities
+│   └── history.cpp     # (Optional) Command history
+├── include/
+│   ├── shell.hpp
+│   ├── command.hpp
+│   ├── executor.hpp
+│   ├── builtins.hpp
+│   ├── util.hpp
+│   └── history.hpp
+├── Makefile
+├── README.md
+└── .gitignore
+```
+
 ---
 
-## Deliverables at the End of **Day 1**
+## Progress Roadmap
+
+### **Day 1** - Shell Initialization
 
 - [x] Project compiles with `make`
 - [x] **Print Prompt:** `ninxsh >`
@@ -31,7 +57,7 @@ make clean  # To delete the binary
 - [x] Gracefully handles empty input and `Ctrl + C` (EOF)
 - [x] Initial commits in Git
 
-## Deliverables at the End of **Day 2**
+### **Day 2** - External Command Execution
 
 - [x] Run external commands using `fork()` and `execvp()`
 - [x] Supports basic Unix commands like `ls`, `pwd`, `echo`, `date`, etc.
@@ -39,3 +65,10 @@ make clean  # To delete the binary
 - [x] Robust input tokenization and conversion to C-style argument arrays
 - [x] Handles command execution filure gracefully without crashing
 - [x] Proper memory management with `strdup()` and `free()`
+
+### **Day 3** - Builtin Commands
+
+- [x] Implemented `exit`
+- [x] Implemented `cd [path]` (fallback `$HOME`)
+- [x] Implemented `clear` using ANSI escape sequence
+- [x] `Builtins` are handled in parent process (no `fork`)
