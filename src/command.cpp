@@ -1,5 +1,6 @@
 #include "command.hpp"
 #include "builtin.hpp"
+#include "utils.hpp"
 #include <sstream>
 #include <vector>
 #include <string>
@@ -12,7 +13,7 @@ std::vector<char*> tokenize(const std::string& input){
     std::vector<std::string> tokens;
 
     while(iss>>word){
-        tokens.push_back(word);
+        tokens.push_back(expandPath(word));
     }
 
     std::vector<char *> argv;
