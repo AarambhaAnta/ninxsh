@@ -81,3 +81,9 @@ mkdir -p ninxsh/src ninxsh/include \
 - [x] Implemented `cd [path]` (fallback `$HOME`)
 - [x] Implemented `clear` using ANSI escape sequence
 - [x] `Builtins` are handled in parent process (no `fork`)
+
+### **Day 4** - Path resolution
+
+- [x] Handle absolute & relative path commands
+- [x] Support for `~` expansion to `$HOME`
+- [x] Support for environment variable expansion like `$HOME`, `$USER`
