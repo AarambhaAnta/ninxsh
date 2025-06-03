@@ -87,3 +87,10 @@ mkdir -p ninxsh/src ninxsh/include \
 - [x] Handle absolute & relative path commands
 - [x] Support for `~` expansion to `$HOME`
 - [x] Support for environment variable expansion like `$HOME`, `$USER`
+
+### **Day 5** - I/O Redirection
+
+- [x] Input Redirection (`command < file.txt`)
+- [x] Output Redirection (`command > file.txt`)
+- [x] Used `dup2()` for redirection
+- [x] Refactored execution into `executor.cpp`
