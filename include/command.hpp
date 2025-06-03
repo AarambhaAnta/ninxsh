@@ -4,6 +4,18 @@
 #include <string>
 #include <vector>
 
-std::vector<char *> tokenize(const std::string &input);
+struct ParsedCommand
+{
+    std::vector<char *> args;
+    std::string inputFile;
+    std::string outputFile;
+
+    ~ParsedCommand();
+};
+
+
+ParsedCommand parseCommand(const std::string &input);
+
+bool isBuiltin(const std::string &cmd);
 
 #endif    // COMMAND_HPP

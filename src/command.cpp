@@ -7,24 +7,49 @@
 #include <cstring>
 #include <cstdlib>
 
-std::vector<char*> tokenize(const std::string& input){
+ParsedCommand::~ParsedCommand()
+{
+    for (auto arg : args)
+    {
+        free(arg);
+    }
+}
+
+ParsedCommand parseCommand(const std::string &input)
+{
     std::istringstream iss(input);
     std::string word;
     std::vector<std::string> tokens;
+    std::string infile, outfile;
 
-    while(iss>>word){
-        tokens.push_back(expandPath(word));
+    while (iss >> word)
+    {
+        if (word == "<")
+        {
+            iss >> infile;
+        }
+        else if (word == ">")
+        {
+            iss >> outfile;
+        }
+        else
+        {
+            tokens.push_back(expandPath(word));
+        }
     }
 
-    std::vector<char *> argv;
-    for(const auto& token:tokens){
-        argv.push_back(strdup(token.c_str()));
+    ParsedCommand cmd;
+    for (const auto &token : tokens)
+    {
+        cmd.args.push_back(strdup(token.c_str()));
     }
-    argv.push_back(nullptr);
-
-    return argv;
+    cmd.args.push_back(nullptr);
+    cmd.inputFile = infile;
+    cmd.outputFile = outfile;
+    return cmd;
 }
 
-bool isBuiltin(const std::string &cmd){
+bool isBuiltin(const std::string &cmd)
+{
     return cmd == "exit" || cmd == "clear" || cmd == "cd";
 }
