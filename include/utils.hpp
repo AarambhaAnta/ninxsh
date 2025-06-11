@@ -3,6 +3,6 @@
 
 #include <string>
 
-std::string expandPath(const std::string &path);
+std::string expandPath(const std::string& path);
 
-#endif // UTIL_HPP
+#endif  // UTIL_HPP
