@@ -10,8 +10,10 @@
 - REPL prompt
 - Builtin Commands (`exit`, `echo`, `cd`, etc.)
 - External executable support using `fork()` and `execvp()`
+- Input/output redirection (`<`, `>`)
+- Command pipelines (`|`)
 - Command history (planned)
-- Quoting, redirection & pipelines (planned)
+- Quoting (planned)
 
 ## Build Instructions
 
@@ -19,6 +21,15 @@
 make        # To build ninxsh
 ./ninxsh    # To run ninxsh
 make clean  # To delete the binary
+```
+
+## Developer Setup
+
+To enable IDE features like auto-complete and jump-to-definition, generate a `compile_commands.json`:
+
+```bash
+make clean
+bear -- make
 ```
 
 ## Project Structure
@@ -94,3 +105,10 @@ mkdir -p ninxsh/src ninxsh/include \
 - [x] Output Redirection (`command > file.txt`)
 - [x] Used `dup2()` for redirection
 - [x] Refactored execution into `executor.cpp`
+
+### **Day 6** - Command Pipelines
+
+- [x] Support for piping commands (`ls -l | grep txt`)
+- [x] Implemented multi-command pipeline execution with `pipe()` and multiple `fork()`s
+- [x] Refactored `Command` and `ParsedCommand` to support pipelines
+- [x] Added separate `executePipeline()` function for handling piped commands
