@@ -5,17 +5,31 @@
 *.o
 *.out
 *.exe
+*.a
+*.so
+*.dll
+*.obj
+
+# clang-format output
+compile_commands.json
+
+# Ignore Clangd/bear/editor cache
+.cache/
+.clangd/
 
 # Ignore CMake files
 CMakeFiles/
 CMakeCache.txt
 cmake_install.cmake
+
 # Makefile
 
 # Ignore user-specific files
 *.swp
 *.swo
 *.log
+*.tmp
+*.bak
 
 # Ignore OS-specific files
 .DS_Store
