@@ -4,18 +4,20 @@
 #include <string>
 #include <vector>
 
-struct ParsedCommand
-{
-    std::vector<char *> args;
+// Single Command in a pipeline
+struct Command {
+    std::vector<char*> args;
     std::string inputFile;
     std::string outputFile;
+};
+
+struct ParsedCommand {
+    // Vector of commands in a pipeline
+    std::vector<Command> pipeline;
 
     ~ParsedCommand();
 };
 
+ParsedCommand parseCommand(const std::string& input);
 
-ParsedCommand parseCommand(const std::string &input);
-
-bool isBuiltin(const std::string &cmd);
-
-#endif    // COMMAND_HPP
+#endif  // COMMAND_HPP
