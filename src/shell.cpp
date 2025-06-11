@@ -1,26 +1,24 @@
 #include "shell.hpp"
-#include "command.hpp"
-#include "builtin.hpp"
-#include "executor.hpp"
 
+#include <cstdlib>
 #include <iostream>
 #include <string>
-#include <unistd.h>
 #include <sys/wait.h>
-#include <cstdlib>
+#include <unistd.h>
 
-void Shell::run()
-{
+#include "builtin.hpp"
+#include "command.hpp"
+#include "executor.hpp"
+
+void Shell::run() {
     std::string input;
 
-    while (true)
-    {
+    while (true) {
         printPrompt();
         std::getline(std::cin, input);
 
         // Handle EOF (Ctrl + C)
-        if (std::cin.eof())
-        {
+        if (std::cin.eof()) {
             std::cout << '\n';
             break;
         }
@@ -31,16 +29,17 @@ void Shell::run()
 
         ParsedCommand parsed = parseCommand(input);
 
-        if (parsed.args.empty())
-        {
+        // Skip if no commands were parsed
+        if (parsed.pipeline.empty() || parsed.pipeline[0].args.empty()) {
             continue;
         }
 
-        std::string cmd = parsed.args[0];
+        // Get the first command to check if it's a builtin
+        std::string cmd = parsed.pipeline[0].args[0];
 
-        if (isBuiltin(cmd))
-        {
-            executeBuiltin(parsed.args);
+        // Only run builtins if it's a single command (not a pipeline)
+        if (parsed.pipeline.size() == 1 && isBuiltin(cmd)) {
+            executeBuiltin(parsed.pipeline[0].args);
             continue;
         }
 
@@ -48,7 +47,6 @@ void Shell::run()
     }
 }
 
-void Shell::printPrompt() const
-{
+void Shell::printPrompt() const {
     std::cout << "🔮ninxsh > " << std::flush;
 }

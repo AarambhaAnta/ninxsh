@@ -3,6 +3,7 @@
 
 #include "command.hpp"
 
-void executeExternal(const ParsedCommand &cmd);
+void executeExternal(const ParsedCommand& cmd);
+void executePipeline(const ParsedCommand& cmd);
 
-#endif // EXECUTOR_HPP
+#endif  // EXECUTOR_HPP
