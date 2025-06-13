@@ -11,9 +11,11 @@
 #include "executor.hpp"
 
 void Shell::run() {
+    setupSignalHandlers();
     std::string input;
 
     while (true) {
+        cleanupZombieProcesses();
         printPrompt();
         std::getline(std::cin, input);
 
