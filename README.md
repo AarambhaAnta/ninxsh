@@ -112,3 +112,11 @@ mkdir -p ninxsh/src ninxsh/include \
 - [x] Implemented multi-command pipeline execution with `pipe()` and multiple `fork()`s
 - [x] Refactored `Command` and `ParsedCommand` to support pipelines
 - [x] Added separate `executePipeline()` function for handling piped commands
+
+### **Day 7** - Background Execution
+
+- [x] Support for background processes with `&` (`sleep 10 &`)
+- [x] Print job PID when running in background
+- [x] Implemented SIGCHLD handler to avoid zombie processes
+- [x] Used non-blocking `waitpid()` with `WNOHANG` for cleanup
+- [x] Added proper signal handling with `sigaction()`
