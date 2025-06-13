@@ -9,6 +9,7 @@ struct Command {
     std::vector<char*> args;
     std::string inputFile;
     std::string outputFile;
+    bool isBackground = false;
 };
 
 struct ParsedCommand {
