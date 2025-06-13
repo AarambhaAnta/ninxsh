@@ -1,14 +1,39 @@
 #include "executor.hpp"
 
+#include <cstddef>
 #include <cstdio>
 #include <cstdlib>
 #include <fcntl.h>
 #include <iostream>
+#include <signal.h>
 #include <sys/wait.h>
 #include <unistd.h>
 #include <vector>
 
 #include "command.hpp"
+
+void sigchldHandler(int /*sig*/) {
+    while (waitpid(-1, NULL, WNOHANG)) {
+    }
+}
+
+void setupSignalHandlers() {
+    struct sigaction sa;
+    sa.sa_handler = sigchldHandler;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = SA_RESTART | SA_NOCLDSTOP;
+
+    if (sigaction(SIGCHLD, &sa, NULL) == -1) {
+        std::cout << "ninxsh: sigaction error\n";
+    }
+}
+
+void cleanupZombieProcesses() {
+    int status;
+    pid_t pid;
+    while ((pid = waitpid(-1, &status, WNOHANG)) > 0) {
+    }
+}
 
 void executeExternal(const ParsedCommand& cmd) {
     // If there's more than one command in the pipeline, use the pipeline executor
@@ -51,8 +76,13 @@ void executeExternal(const ParsedCommand& cmd) {
         std::cerr << "ninxsh: command not found: " << command.args[0] << "\n";
         exit(EXIT_FAILURE);
     } else {
-        int status;
-        waitpid(pid, &status, 0);
+        if (command.isBackground) {
+            std::cout << "[1] " << pid << "\n";
+        } else {
+            int status;
+            waitpid(pid, &status, 0);
+        }
+        cleanupZombieProcesses();
     }
 }
 
@@ -135,9 +165,17 @@ void executePipeline(const ParsedCommand& cmd) {
         close(pipeFds[i]);
     }
 
-    // Wait for all the child processes to complete
-    for (int i = 0; i < numCommands; i++) {
-        int status;
-        waitpid(pids[i], &status, 0);
+    bool isBackground = cmd.pipeline[numCommands - 1].isBackground;
+
+    if (isBackground) {
+        std::cout << "[1] " << pids[numCommands - 1] << "\n";
+    } else {
+        // Wait for all the child processes to complete
+        for (int i = 0; i < numCommands; i++) {
+            int status;
+            waitpid(pids[i], &status, 0);
+        }
     }
+
+    cleanupZombieProcesses();
 }
