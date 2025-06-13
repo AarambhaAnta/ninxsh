@@ -40,6 +40,7 @@ ParsedCommand parseCommand(const std::string& input) {
         std::string word;
         std::vector<std::string> tokens;
         std::string infile, outfile;
+        bool isBackground = false;
 
         // Parse each command for redirections and arguments
         while (iss >> word) {
@@ -47,6 +48,8 @@ ParsedCommand parseCommand(const std::string& input) {
                 iss >> infile;
             } else if (word == ">") {
                 iss >> outfile;
+            } else if (word == "&" && tokens.size() > 0) {
+                isBackground = true;
             } else {
                 tokens.push_back(expandPath(word));
             }
@@ -60,6 +63,7 @@ ParsedCommand parseCommand(const std::string& input) {
         cmd.args.push_back(nullptr);
         cmd.inputFile = infile;
         cmd.outputFile = outfile;
+        cmd.isBackground = isBackground;
 
         // Add this command to the pipeline
         result.pipeline.push_back(cmd);
