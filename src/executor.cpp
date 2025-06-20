@@ -1,5 +1,6 @@
 #include "executor.hpp"
 
+#include <csignal>
 #include <cstddef>
 #include <cstdio>
 #include <cstdlib>
@@ -12,8 +13,28 @@
 
 #include "command.hpp"
 
-void sigchldHandler(int /*sig*/) {
-    while (waitpid(-1, NULL, WNOHANG)) {
+bool isShellForeground = true;
+
+void sigchldHandler(int /* sig */) {
+    // Loop through all zombies and reap them
+    while (waitpid(-1, NULL, WNOHANG) > 0) {
+        // This loop handles zombie processes
+    }
+}
+
+void sigintHandler(int /* sig */) {
+    if (isShellForeground) {
+        // If we're in the shell, just print a new prompt
+        std::cout << "\n🔮ninxsh > ";
+        std::cout.flush();
+    }
+    // If we're not in the shell, the default behavior will kill the foreground process
+}
+
+void sigtstpHandler(int /* sig */) {
+    if (isShellForeground) {
+        std::cout << "\n🔮ninxsh > ";
+        std::cout.flush();
     }
 }
 
@@ -24,7 +45,25 @@ void setupSignalHandlers() {
     sa.sa_flags = SA_RESTART | SA_NOCLDSTOP;
 
     if (sigaction(SIGCHLD, &sa, NULL) == -1) {
-        std::cout << "ninxsh: sigaction error\n";
+        std::cout << "ninxsh: sigaction error for SIGCHLD\n";
+    }
+
+    // Set up SIGINT (Ctrl+C) handler
+    sa.sa_handler = sigintHandler;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = SA_RESTART;
+
+    if (sigaction(SIGINT, &sa, NULL) == -1) {
+        std::cout << "ninxsh: sigaction error for SIGINT\n";
+    }
+
+    // Set up SIGTSTP (Ctrl+Z) handler
+    sa.sa_handler = sigtstpHandler;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = SA_RESTART;
+
+    if (sigaction(SIGTSTP, &sa, NULL) == -1) {
+        std::cout << "ninxsh: sigaction error for SIGTSTP\n";
     }
 }
 
@@ -78,9 +117,12 @@ void executeExternal(const ParsedCommand& cmd) {
     } else {
         if (command.isBackground) {
             std::cout << "[1] " << pid << "\n";
+            isShellForeground = true;
         } else {
+            isShellForeground = false;
             int status;
             waitpid(pid, &status, 0);
+            isShellForeground = true;
         }
         cleanupZombieProcesses();
     }
@@ -169,12 +211,15 @@ void executePipeline(const ParsedCommand& cmd) {
 
     if (isBackground) {
         std::cout << "[1] " << pids[numCommands - 1] << "\n";
+        isShellForeground = true;
     } else {
+        isShellForeground = false;
         // Wait for all the child processes to complete
         for (int i = 0; i < numCommands; i++) {
             int status;
             waitpid(pids[i], &status, 0);
         }
+        isShellForeground = true;
     }
 
     cleanupZombieProcesses();

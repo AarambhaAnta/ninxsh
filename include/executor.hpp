@@ -3,6 +3,8 @@
 
 #include "command.hpp"
 
+extern bool isShellForeground;
+
 void executeExternal(const ParsedCommand& cmd);
 void executePipeline(const ParsedCommand& cmd);
 void setupSignalHandlers();
