@@ -19,7 +19,7 @@ void Shell::run() {
         printPrompt();
         std::getline(std::cin, input);
 
-        // Handle EOF (Ctrl + C)
+        // Handle EOF (Ctrl+D)
         if (std::cin.eof()) {
             std::cout << '\n';
             break;
