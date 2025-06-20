@@ -7,20 +7,32 @@
 
 `ninxsh` is a lightweight shell written in modern C++. It supports:
 
-- REPL prompt
-- Builtin Commands (`exit`, `echo`, `cd`, etc.)
+- REPL prompt with custom emoji 🔮
+- Builtin Commands (`exit`, `cd`, `clear`)
 - External executable support using `fork()` and `execvp()`
 - Input/output redirection (`<`, `>`)
-- Command pipelines (`|`)
+- Command pipelines (`|`) with multiple commands
+- Background process execution (`&`)
+- Signal handling (Ctrl+C, Ctrl+Z)
+- Path expansion (`~` to home directory)
+- Environment variable expansion (`$HOME`, `$USER`, etc.)
+- Zombie process cleanup
+- Comprehensive test suite for all features
 - Command history (planned)
 - Quoting (planned)
 
 ## Build Instructions
 
 ```bash
-make        # To build ninxsh
-./ninxsh    # To run ninxsh
-make clean  # To delete the binary
+make         # Build the shell in default mode
+make debug   # Build with debug symbols and without optimizations
+make release # Build with optimizations
+make sanitize # Build with sanitizers for catching memory issues
+make format  # Format code using clang-format
+make test    # Run the test suite
+make install # Install the shell (requires sudo)
+make clean   # Delete build artifacts
+make help    # Show available commands
 ```
 
 ## Developer Setup
@@ -51,9 +63,18 @@ ninxsh/
 │   ├── builtins.hpp
 │   ├── util.hpp
 │   └── history.hpp
-├── Makefile
-├── README.md
-└── .gitignore
+├── tests/
+│   ├── test_runner.cpp         # Test runner framework
+│   ├── command_test.cpp        # Command parsing tests
+│   ├── builtin_test.cpp        # Builtin command tests
+│   ├── utils_test.cpp          # Utility function tests
+│   ├── executor_test.cpp       # Command execution tests
+│   ├── io_pipeline_test.cpp    # I/O and pipeline tests
+│   ├── signal_test.cpp         # Signal handling tests
+│   └── README.md               # Test documentation
+├── Makefile                    # Build system
+├── README.md                   # Project documentation
+└── .gitignore                  # Git ignore file
 ```
 
 > To generate the initial project structure:
@@ -120,3 +141,16 @@ mkdir -p ninxsh/src ninxsh/include \
 - [x] Implemented SIGCHLD handler to avoid zombie processes
 - [x] Used non-blocking `waitpid()` with `WNOHANG` for cleanup
 - [x] Added proper signal handling with `sigaction()`
+
+### **Day 8** - Robust Signal Handling & Testing
+
+- [x] Implemented comprehensive signal handling (SIGINT, SIGTSTP, SIGCHLD)
+- [x] Shell doesn't terminate on Ctrl+C or Ctrl+Z
+- [x] Ensured proper foreground/background state management
+- [x] Added zombie process cleanup system
+- [x] Created comprehensive test suite with test runner
+- [x] Added unit tests for commands, builtins, utils, and executor
+- [x] Implemented integration tests for I/O redirection and pipelines
+- [x] Added signal handling tests
+- [x] Enhanced Makefile with debug/release/sanitize/format targets
+- [x] Added test infrastructure with proper pattern rules
