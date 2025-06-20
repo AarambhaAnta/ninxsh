@@ -23,6 +23,20 @@ bool executeBuiltin(const std::vector<char*>& argv) {
     return true;
 }
 
+bool executeBuiltin(const std::vector<const char*>& argv) {
+    // Convert from const char* to char* for compatibility
+    std::vector<char*> nonConstArgv;
+    for (const char* arg : argv) {
+        if (arg) {
+            // This is safe since executeBuiltin doesn't modify the args
+            nonConstArgv.push_back(const_cast<char*>(arg));
+        } else {
+            nonConstArgv.push_back(nullptr);
+        }
+    }
+    return executeBuiltin(nonConstArgv);
+}
+
 bool isBuiltin(const std::string& cmd) {
     return cmd == "exit" || cmd == "clear" || cmd == "cd";
 }
