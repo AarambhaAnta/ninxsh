@@ -55,11 +55,11 @@ std::vector<std::string> tokenize(const std::string& str, char delimiter) {
 }
 
 std::string trim(const std::string& str) {
-    const auto start = str.find_first_not_of("\t\n\r\f\v");
+    const auto start = str.find_first_not_of(" \t\n\r\f\v");
     if (start == std::string::npos) {
         return "";
     }
 
-    const auto end = str.find_last_not_of("\t\n\r\f\v");
+    const auto end = str.find_last_not_of(" \t\n\r\f\v");
     return str.substr(start, end - start + 1);
 }
