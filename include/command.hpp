@@ -16,6 +16,10 @@ struct ParsedCommand {
     // Vector of commands in a pipeline
     std::vector<Command> pipeline;
 
+    // Error state tracking
+    bool hasError = false;
+    std::string errorMessage;
+
     ~ParsedCommand();
 };
 

@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 
+#include "limits.hpp"
 #include "utils.hpp"
 
 ParsedCommand::~ParsedCommand() {
@@ -21,9 +22,10 @@ ParsedCommand parseCommand(const std::string& input) {
     ParsedCommand result;
 
     // Early validation: reject excessively long input to prevent DoS
-    const size_t MAX_INPUT_LENGTH = 4096;  // Reasonable limit for command line input
-    if (input.length() > MAX_INPUT_LENGTH) {
-        // Return empty result - caller should handle this as invalid input
+    if (input.length() > ninxsh::limits::MAX_INPUT_LENGTH) {
+        result.hasError = true;
+        result.errorMessage = "Input too long (maximum " +
+                              std::to_string(ninxsh::limits::MAX_INPUT_LENGTH) + " characters)";
         return result;
     }
 
