@@ -2,6 +2,7 @@
 
 #include <cstdlib>
 #include <iostream>
+#include <signal.h>
 #include <string>
 #include <sys/wait.h>
 #include <unistd.h>
@@ -22,10 +23,12 @@ Shell::~Shell() {
 
 void Shell::run() {
     setupSignalHandlers();
+    setGlobalJobManager(&jobManager);  // Set global job manager for signal handlers
     std::string input;
 
     while (true) {
         cleanupZombieProcesses();
+        jobManager.cleanupJobs();  // Clean up finished background jobs
         printPrompt();
         std::getline(std::cin, input);
 
@@ -83,13 +86,127 @@ void Shell::run() {
             continue;
         }
 
+        // Check for jobs command
+        if (cmd == "jobs" && parsed.pipeline.size() == 1) {
+            jobManager.printJobs();
+            continue;
+        }
+
+        // Check for kill command
+        if (cmd == "kill" && parsed.pipeline.size() == 1) {
+            if (parsed.pipeline[0].args.size() > 1 && parsed.pipeline[0].args[1]) {
+                try {
+                    pid_t pid = std::stoi(parsed.pipeline[0].args[1]);
+                    if (kill(pid, SIGTERM) == 0) {
+                        std::cout << "Process " << pid << " terminated\n";
+                    } else {
+                        std::perror("kill");
+                    }
+                } catch (const std::exception& e) {
+                    std::cout << "kill: invalid PID '" << parsed.pipeline[0].args[1] << "'\n";
+                }
+            } else {
+                std::cout << "Usage: kill <pid>\n";
+            }
+            continue;
+        }
+
+        // Check for fg command (foreground)
+        if (cmd == "fg" && parsed.pipeline.size() == 1) {
+            if (parsed.pipeline[0].args.size() > 1 && parsed.pipeline[0].args[1]) {
+                try {
+                    int jobId = std::stoi(parsed.pipeline[0].args[1]);
+                    Job* job = jobManager.findJobById(jobId);
+                    if (job) {
+                        std::cout << job->command << std::endl;
+                        if (job->isStopped) {
+                            // Resume the job
+                            kill(job->pid, SIGCONT);
+                            job->isStopped = false;
+                            job->isRunning = true;
+                        }
+                        // Wait for the job to complete
+                        int status;
+                        waitpid(job->pid, &status, 0);
+                        jobManager.removeJob(job->pid);
+                    } else {
+                        std::cout << "fg: job " << jobId << " not found\n";
+                    }
+                } catch (const std::exception& e) {
+                    std::cout << "fg: invalid job ID '" << parsed.pipeline[0].args[1] << "'\n";
+                }
+            } else {
+                // No job ID specified, use most recent job
+                const auto& jobs = jobManager.getJobs();
+                if (!jobs.empty()) {
+                    Job* job = const_cast<Job*>(&jobs.back());
+                    std::cout << job->command << std::endl;
+                    if (job->isStopped) {
+                        kill(job->pid, SIGCONT);
+                        job->isStopped = false;
+                        job->isRunning = true;
+                    }
+                    int status;
+                    waitpid(job->pid, &status, 0);
+                    jobManager.removeJob(job->pid);
+                } else {
+                    std::cout << "fg: no current job\n";
+                }
+            }
+            continue;
+        }
+
+        // Check for bg command (background)
+        if (cmd == "bg" && parsed.pipeline.size() == 1) {
+            if (parsed.pipeline[0].args.size() > 1 && parsed.pipeline[0].args[1]) {
+                try {
+                    int jobId = std::stoi(parsed.pipeline[0].args[1]);
+                    Job* job = jobManager.findJobById(jobId);
+                    if (job) {
+                        if (job->isStopped) {
+                            // Resume the job in background
+                            kill(job->pid, SIGCONT);
+                            job->isStopped = false;
+                            job->isRunning = true;
+                            std::cout << "[" << job->jobId << "] " << job->command << " &\n";
+                        } else {
+                            std::cout << "bg: job " << jobId << " already running\n";
+                        }
+                    } else {
+                        std::cout << "bg: job " << jobId << " not found\n";
+                    }
+                } catch (const std::exception& e) {
+                    std::cout << "bg: invalid job ID '" << parsed.pipeline[0].args[1] << "'\n";
+                }
+            } else {
+                // No job ID specified, use most recent stopped job
+                const auto& jobs = jobManager.getJobs();
+                Job* stoppedJob = nullptr;
+                for (auto& job : jobs) {
+                    if (job.isStopped) {
+                        stoppedJob = const_cast<Job*>(&job);
+                        break;
+                    }
+                }
+                if (stoppedJob) {
+                    kill(stoppedJob->pid, SIGCONT);
+                    stoppedJob->isStopped = false;
+                    stoppedJob->isRunning = true;
+                    std::cout << "[" << stoppedJob->jobId << "] " << stoppedJob->command << " &\n";
+                } else {
+                    std::cout << "bg: no stopped jobs\n";
+                }
+            }
+            continue;
+        }
+
         // Only run builtins if it's a single command (not a pipeline)
         if (parsed.pipeline.size() == 1 && isBuiltin(cmd)) {
             executeBuiltin(parsed.pipeline[0].args);
             continue;
         }
 
-        executeExternal(parsed);
+        executeExternal(parsed, &jobManager);
     }
 }
 

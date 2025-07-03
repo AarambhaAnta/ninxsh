@@ -8,15 +8,16 @@
 `ninxsh` is a lightweight shell written in modern C++. It supports:
 
 - REPL prompt with custom emoji 🔮
-- Builtin Commands (`exit`, `cd`, `clear`, `history`)
+- Builtin Commands (`exit`, `cd`, `clear`, `history`, `jobs`, `kill`, `fg`, `bg`)
 - External executable support using `fork()` and `execvp()`
 - Input/output redirection (`<`, `>`)
 - Command pipelines (`|`) with multiple commands
 - Background process execution (`&`)
+- Job control and management (`jobs`, `kill <pid>`, `fg [job_id]`, `bg [job_id]`)
 - Signal handling (Ctrl+C, Ctrl+Z)
 - Path expansion (`~` to home directory)
 - Environment variable expansion (`$HOME`, `$USER`, etc.)
-- Zombie process cleanup
+- Zombie process cleanup with automatic job status updates
 - DoS protection with configurable limits (centralized in `limits.hpp`)
 - Comprehensive test suite for all features
 - Command history with persistent storage and execution (`!!`, `!n`)
@@ -119,6 +120,11 @@ mkdir -p ninxsh/src ninxsh/include ninxsh/tests \
 - [x] Implemented `exit`
 - [x] Implemented `cd [path]` (fallback `$HOME`)
 - [x] Implemented `clear` using ANSI escape sequence
+- [x] Implemented `history` with persistent storage and execution (`!!`, `!n`)
+- [x] Implemented `jobs` for listing background jobs
+- [x] Implemented `kill <pid>` for terminating processes
+- [x] Implemented `fg [job_id]` for bringing jobs to foreground
+- [x] Implemented `bg [job_id]` for resuming jobs in background
 - [x] `Builtins` are handled in parent process (no `fork`)
 
 ### **Day 4** - Path resolution
@@ -202,11 +208,27 @@ mkdir -p ninxsh/src ninxsh/include ninxsh/tests \
 
 ## Testing
 
+The ninxsh project includes a comprehensive C++ test suite covering all major functionality.
+
 ### Running All Tests
 
 ```bash
 make test    # Run complete test suite
 ```
+
+The test suite includes:
+
+- **Command parsing** - Input tokenization and validation
+- **Builtin commands** - All builtin functions (cd, exit, clear, history, jobs, kill, fg, bg)
+- **External execution** - Fork/exec functionality and process management
+- **I/O redirection & pipelines** - File redirection and command chaining
+- **Signal handling** - Ctrl+C, Ctrl+Z, and process cleanup
+- **Job management** - Background job tracking and control
+- **History functionality** - Command storage and expansion
+- **DoS protection** - Input validation and security limits
+- **Utility functions** - Helper and utility code
+
+All tests use a unified framework and report PASSED/FAILED status.
 
 ### Manual Testing Examples
 
@@ -224,4 +246,15 @@ history
 # Test environment variables
 echo $HOME
 cd $HOME
+
+# Test background jobs and job control
+sleep 30 &           # Start background job
+jobs                 # List active jobs
+kill 1234            # Kill process by PID
+fg 1                 # Bring job 1 to foreground
+bg 1                 # Resume job 1 in background
+
+# Test pipelines with background
+ls -la | grep txt &  # Run pipeline in background
+jobs                 # View the background pipeline
 ```

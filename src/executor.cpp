@@ -12,13 +12,26 @@
 #include <vector>
 
 #include "command.hpp"
+#include "jobs.hpp"
 
 bool isShellForeground = true;
+static JobManager* globalJobManager = nullptr;
 
 void sigchldHandler(int /* sig */) {
     // Loop through all zombies and reap them
-    while (waitpid(-1, NULL, WNOHANG) > 0) {
-        // This loop handles zombie processes
+    int status;
+    pid_t pid;
+    while ((pid = waitpid(-1, &status, WNOHANG)) > 0) {
+        // Update job status if we have a job manager
+        if (globalJobManager) {
+            Job* job = globalJobManager->findJobByPid(pid);
+            if (job) {
+                if (WIFEXITED(status) || WIFSIGNALED(status)) {
+                    // Job finished, remove it
+                    globalJobManager->removeJob(pid);
+                }
+            }
+        }
     }
 }
 
@@ -74,10 +87,10 @@ void cleanupZombieProcesses() {
     }
 }
 
-void executeExternal(const ParsedCommand& cmd) {
+void executeExternal(const ParsedCommand& cmd, JobManager* jobManager) {
     // If there's more than one command in the pipeline, use the pipeline executor
     if (cmd.pipeline.size() > 1) {
-        executePipeline(cmd);
+        executePipeline(cmd, jobManager);
         return;
     }
 
@@ -116,7 +129,18 @@ void executeExternal(const ParsedCommand& cmd) {
         exit(EXIT_FAILURE);
     } else {
         if (command.isBackground) {
-            std::cout << "[1] " << pid << "\n";
+            // Add job to job manager if provided
+            if (jobManager) {
+                std::string jobCommand = command.args[0];
+                for (size_t i = 1; i < command.args.size() - 1;
+                     ++i) {  // -1 because last element is nullptr
+                    jobCommand += " " + std::string(command.args[i]);
+                }
+                int jobId = jobManager->addJob(pid, jobCommand);
+                std::cout << "[" << jobId << "] " << pid << std::endl;
+            } else {
+                std::cout << "[1] " << pid << "\n";
+            }
             isShellForeground = true;
         } else {
             isShellForeground = false;
@@ -128,7 +152,7 @@ void executeExternal(const ParsedCommand& cmd) {
     }
 }
 
-void executePipeline(const ParsedCommand& cmd) {
+void executePipeline(const ParsedCommand& cmd, JobManager* jobManager) {
     int numCommands = cmd.pipeline.size();
     std::vector<int> pipeFds((numCommands - 1) * 2);  // Each pipe has 2 file descriptors
 
@@ -210,7 +234,25 @@ void executePipeline(const ParsedCommand& cmd) {
     bool isBackground = cmd.pipeline[numCommands - 1].isBackground;
 
     if (isBackground) {
-        std::cout << "[1] " << pids[numCommands - 1] << "\n";
+        // Add pipeline job to job manager if provided
+        if (jobManager) {
+            // Build command string for the entire pipeline
+            std::string pipelineCommand;
+            for (int i = 0; i < numCommands; ++i) {
+                if (i > 0)
+                    pipelineCommand += " | ";
+
+                pipelineCommand += cmd.pipeline[i].args[0];
+                for (size_t j = 1; j < cmd.pipeline[i].args.size() - 1;
+                     ++j) {  // -1 because last element is nullptr
+                    pipelineCommand += " " + std::string(cmd.pipeline[i].args[j]);
+                }
+            }
+            int jobId = jobManager->addJob(pids[numCommands - 1], pipelineCommand);
+            std::cout << "[" << jobId << "] " << pids[numCommands - 1] << std::endl;
+        } else {
+            std::cout << "[1] " << pids[numCommands - 1] << "\n";
+        }
         isShellForeground = true;
     } else {
         isShellForeground = false;
@@ -223,4 +265,8 @@ void executePipeline(const ParsedCommand& cmd) {
     }
 
     cleanupZombieProcesses();
+}
+
+void setGlobalJobManager(JobManager* jobManager) {
+    globalJobManager = jobManager;
 }
