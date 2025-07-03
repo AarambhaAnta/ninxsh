@@ -25,6 +25,8 @@
 
 ## Build Instructions
 
+### Universal Build (Cross-Platform)
+
 ```bash
 make         # Build the shell in default mode
 make debug   # Build with debug symbols and without optimizations
@@ -36,6 +38,45 @@ make install # Install the shell (requires sudo)
 make clean   # Delete build artifacts
 make help    # Show available commands
 ```
+
+### Platform-Optimized Builds
+
+For platform-specific optimizations and features, use the specialized Makefiles:
+
+```bash
+# macOS (Xcode toolchain, code signing, app bundles)
+cd Resources/Mac && make
+
+# Linux (distribution detection, package creation, valgrind)
+cd Resources/Linux && make
+
+# Windows (MinGW/MSYS2, installers, portable builds)
+cd Resources/Windows && make
+```
+
+#### Platform-Specific Features
+
+**macOS** (`Resources/Mac/`):
+
+- Debug symbols for lldb (`make dsym`)
+- Code signing (`make codesign`)
+- App bundle creation (`make bundle`)
+- Apple Silicon support (`make install-arm64`)
+
+**Linux** (`Resources/Linux/`):
+
+- Auto-detect distribution and package manager
+- Memory testing (`make valgrind`)
+- Performance profiling (`make perf`)
+- Package creation (`make deb`, `make rpm`)
+- Static builds (`make static`)
+
+**Windows** (`Resources/Windows/`):
+
+- NSIS installer creation (`make installer`)
+- Portable ZIP packages (`make portable`)
+- Static linking for portability
+- MSYS2 dependency management (`make deps`)
 
 ## Developer Setup
 
@@ -57,14 +98,16 @@ ninxsh/
 │   ├── executor.cpp    # External execution logic
 │   ├── builtin.cpp     # Built-in command handlers
 │   ├── utils.cpp       # Misc utilities
-│   └── history.cpp     # (Optional) Command history
+│   ├── history.cpp     # Command history
+│   └── jobs.cpp        # Job management
 ├── include/
 │   ├── shell.hpp
 │   ├── command.hpp
 │   ├── executor.hpp
-│   ├── builtins.hpp
-│   ├── util.hpp
+│   ├── builtin.hpp
+│   ├── utils.hpp
 │   ├── history.hpp
+│   ├── jobs.hpp
 │   └── limits.hpp      # DoS protection constants
 ├── tests/
 │   ├── test_runner.cpp         # Test runner framework
@@ -76,22 +119,25 @@ ninxsh/
 │   ├── test_signal.cpp         # Signal handling tests
 │   ├── test_history.cpp        # Command history tests
 │   ├── test_dos_protection.cpp # DoS protection tests
-│   └── README.md               # Test documentation
-├── Makefile                    # Build system
+│   └── test_jobs.cpp           # Job management tests
+├── Resources/
+│   ├── Mac/Makefile            # macOS-optimized build
+│   ├── Linux/Makefile          # Linux-optimized build
+│   └── Windows/Makefile        # Windows-optimized build
+├── Makefile                    # Universal build system
 ├── README.md                   # Project documentation
-├── DOS_PROTECTION.md           # Security documentation
-├── test_dos_fix.py             # DoS protection test script
 └── .gitignore                  # Git ignore file
 ```
 
 > To generate the initial project structure:
 
 ```bash
-mkdir -p ninxsh/src ninxsh/include ninxsh/tests \
-&& touch ninxsh/src/{main.cpp,shell.cpp,command.cpp,executor.cpp,builtin.cpp,utils.cpp,history.cpp} \
-&& touch ninxsh/include/{shell.hpp,command.hpp,executor.hpp,builtins.hpp,util.hpp,history.hpp,limits.hpp} \
-&& touch ninxsh/tests/{test_runner.cpp,test_command.cpp,test_builtin.cpp,test_utils.cpp,test_executor.cpp,test_io_pipeline.cpp,test_signal.cpp,test_history.cpp,test_dos_protection.cpp,README.md} \
-&& touch ninxsh/{Makefile,README.md,.gitignore,DOS_PROTECTION.md}
+mkdir -p ninxsh/{src,include,tests,Resources/{Mac,Linux,Windows}} \
+&& touch ninxsh/src/{main.cpp,shell.cpp,command.cpp,executor.cpp,builtin.cpp,utils.cpp,history.cpp,jobs.cpp} \
+&& touch ninxsh/include/{shell.hpp,command.hpp,executor.hpp,builtin.hpp,utils.hpp,history.hpp,jobs.hpp,limits.hpp} \
+&& touch ninxsh/tests/{test_runner.cpp,test_command.cpp,test_builtin.cpp,test_utils.cpp,test_executor.cpp,test_io_pipeline.cpp,test_signal.cpp,test_history.cpp,test_dos_protection.cpp,test_jobs.cpp} \
+&& touch ninxsh/Resources/{Mac,Linux,Windows}/Makefile \
+&& touch ninxsh/{Makefile,README.md,.gitignore}
 ```
 
 ---
