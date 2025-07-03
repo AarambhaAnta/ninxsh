@@ -17,6 +17,7 @@
 - Path expansion (`~` to home directory)
 - Environment variable expansion (`$HOME`, `$USER`, etc.)
 - Zombie process cleanup
+- DoS protection with configurable limits (centralized in `limits.hpp`)
 - Comprehensive test suite for all features
 - Command history with persistent storage and execution (`!!`, `!n`)
 - Quoting (planned)
@@ -62,28 +63,34 @@ ninxsh/
 │   ├── executor.hpp
 │   ├── builtins.hpp
 │   ├── util.hpp
-│   └── history.hpp
+│   ├── history.hpp
+│   └── limits.hpp      # DoS protection constants
 ├── tests/
 │   ├── test_runner.cpp         # Test runner framework
-│   ├── command_test.cpp        # Command parsing tests
-│   ├── builtin_test.cpp        # Builtin command tests
-│   ├── utils_test.cpp          # Utility function tests
-│   ├── executor_test.cpp       # Command execution tests
-│   ├── io_pipeline_test.cpp    # I/O and pipeline tests
-│   ├── signal_test.cpp         # Signal handling tests
+│   ├── test_command.cpp        # Command parsing tests
+│   ├── test_builtin.cpp        # Builtin command tests
+│   ├── test_utils.cpp          # Utility function tests
+│   ├── test_executor.cpp       # Command execution tests
+│   ├── test_io_pipeline.cpp    # I/O and pipeline tests
+│   ├── test_signal.cpp         # Signal handling tests
+│   ├── test_history.cpp        # Command history tests
+│   ├── test_dos_protection.cpp # DoS protection tests
 │   └── README.md               # Test documentation
 ├── Makefile                    # Build system
 ├── README.md                   # Project documentation
+├── DOS_PROTECTION.md           # Security documentation
+├── test_dos_fix.py             # DoS protection test script
 └── .gitignore                  # Git ignore file
 ```
 
 > To generate the initial project structure:
 
 ```bash
-mkdir -p ninxsh/src ninxsh/include \
+mkdir -p ninxsh/src ninxsh/include ninxsh/tests \
 && touch ninxsh/src/{main.cpp,shell.cpp,command.cpp,executor.cpp,builtin.cpp,utils.cpp,history.cpp} \
-&& touch ninxsh/include/{shell.hpp,command.hpp,executor.hpp,builtins.hpp,util.hpp,history.hpp} \
-&& touch ninxsh/Makefile ninxsh/README.md ninxsh/.gitignore
+&& touch ninxsh/include/{shell.hpp,command.hpp,executor.hpp,builtins.hpp,util.hpp,history.hpp,limits.hpp} \
+&& touch ninxsh/tests/{test_runner.cpp,test_command.cpp,test_builtin.cpp,test_utils.cpp,test_executor.cpp,test_io_pipeline.cpp,test_signal.cpp,test_history.cpp,test_dos_protection.cpp,README.md} \
+&& touch ninxsh/{Makefile,README.md,.gitignore,DOS_PROTECTION.md}
 ```
 
 ---
@@ -164,3 +171,57 @@ mkdir -p ninxsh/src ninxsh/include \
 - [x] Automatic cleanup of oldest commands when history size exceeds limit
 - [x] Support for `!!` to execute the last command
 - [x] Support for `!n` to execute command number n from history
+
+### **Day 10** - Security & Performance Improvements
+
+- [x] Added explicit error state handling to ParsedCommand structure
+- [x] Implemented comprehensive DoS protection with input length validation
+- [x] Prevented history pollution by validating commands before storage
+- [x] Centralized all protection limits in `include/limits.hpp` header
+- [x] Optimized regex compilation with static const patterns
+- [x] Standardized test file naming to `test_*.cpp` convention
+- [x] Added boundary condition tests and enhanced error reporting
+- [x] Updated documentation with security features and architecture
+
+## Security Features
+
+### DoS Protection
+
+- **Input Length Validation**: Commands longer than 4KB are rejected
+- **Path Length Limits**: File paths longer than 2KB are handled gracefully  
+- **String Processing Limits**: Environment variable expansion limited to 2KB strings
+- **Centralized Configuration**: All limits defined in `include/limits.hpp`
+- **Explicit Error Handling**: Clear error messages for rejected input
+- **History Protection**: Invalid commands are not stored in command history
+
+### Performance Optimizations
+
+- **Static Regex Compilation**: Environment variable patterns compiled once
+- **Early Exit Strategies**: Skip expensive operations when possible
+- **Memory Management**: Proper cleanup with RAII patterns
+
+## Testing
+
+### Running All Tests
+
+```bash
+make test    # Run complete test suite
+```
+
+### Manual Testing Examples
+
+```bash
+# Test normal operation
+echo "hello world"
+cd ~
+ls | grep txt
+
+# Test history
+history
+!!
+!1
+
+# Test environment variables
+echo $HOME
+cd $HOME
+```

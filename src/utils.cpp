@@ -6,10 +6,14 @@
 #include <string>
 #include <vector>
 
+#include "limits.hpp"
+
+// Static regex pattern for environment variable matching (compiled once)
+static const std::regex envPattern(R"(\$([A-Za-z_][A-Za-z0-9_]*))");
+
 std::string expandPath(const std::string& path) {
     // Early validation: reject excessively long paths to prevent DoS
-    const size_t MAX_PATH_LENGTH = 2048;  // Reasonable limit for file paths
-    if (path.length() > MAX_PATH_LENGTH) {
+    if (path.length() > ninxsh::limits::MAX_PATH_LENGTH) {
         return path;  // Return unchanged if too long
     }
 
@@ -28,8 +32,7 @@ std::string expandPath(const std::string& path) {
         return result;
     }
 
-    // Only perform regex search if string contains '$' and is reasonable length
-    std::regex envPattern(R"(\$([A-Za-z_][A-Za-z0-9_]*))");
+    // Use static regex pattern (compiled once)
     std::smatch match;
 
     while (std::regex_search(result, match, envPattern)) {
@@ -42,8 +45,7 @@ std::string expandPath(const std::string& path) {
 
 std::string expandEnvVars(const std::string& str) {
     // Early validation: reject excessively long strings to prevent DoS
-    const size_t MAX_STRING_LENGTH = 2048;
-    if (str.length() > MAX_STRING_LENGTH) {
+    if (str.length() > ninxsh::limits::MAX_STRING_LENGTH) {
         return str;  // Return unchanged if too long
     }
 
@@ -53,7 +55,6 @@ std::string expandEnvVars(const std::string& str) {
     }
 
     std::string result = str;
-    std::regex envPattern(R"(\$([A-Za-z_][A-Za-z0-9_]*))");
     std::smatch match;
 
     while (std::regex_search(result, match, envPattern)) {

@@ -52,22 +52,21 @@ void Shell::run() {
             input = expandedInput;
         }
 
-        // Add command to history
-        history.addCommand(input);
+        ParsedCommand parsed = parseCommand(input);
 
-        // Early input validation to prevent DoS attacks
-        const size_t MAX_INPUT_LENGTH = 4096;
-        if (input.length() > MAX_INPUT_LENGTH) {
-            std::cout << "ninxsh: input too long (maximum " << MAX_INPUT_LENGTH << " characters)\n";
+        // Check for parsing errors
+        if (parsed.hasError) {
+            std::cout << "ninxsh: " << parsed.errorMessage << "\n";
             continue;
         }
-
-        ParsedCommand parsed = parseCommand(input);
 
         // Skip if no commands were parsed
         if (parsed.pipeline.empty() || parsed.pipeline[0].args.empty()) {
             continue;
         }
+
+        // Add valid command to history (after validation)
+        history.addCommand(input);
 
         // Get the first command to check if it's a builtin
         std::string cmd = parsed.pipeline[0].args[0];
