@@ -18,11 +18,11 @@
 - **Signal handling** (Ctrl+C, Ctrl+Z)
 - **Path expansion** (`~` to home directory)
 - **Environment variable expansion** (`$HOME`, `$USER`, etc.)
+- **Advanced quote handling** (single quotes, double quotes, escape sequences)
 - **Zombie process cleanup** with automatic job status updates
 - DoS protection with configurable limits (centralized in `limits.hpp`)
 - Comprehensive test suite for all features
 - Command history with persistent storage and execution (`!!`, `!n`)
-- Quoting (planned)
 
 ## Build Instructions
 
@@ -251,6 +251,19 @@ mkdir -p ninxsh/{src,include,tests,Resources/{Mac,Linux,Windows}} \
 - [x] Enhanced test coverage for all terminal functionality
 - [x] Updated documentation with new terminal features
 
+### **Day 12** - Advanced Quote Handling
+
+- [x] Comprehensive quote parsing with new tokenizer in `src/command.cpp`
+- [x] Proper single quote handling (literal strings, no variable expansion)
+- [x] Proper double quote handling (allows variable expansion)
+- [x] Escape sequence support with backslash (`\`) for special characters
+- [x] Mixed quoting support (single, double, and unquoted in same command)
+- [x] Quote-aware environment variable expansion (respects quote context)
+- [x] Pipeline support with quoted arguments
+- [x] Comprehensive test suite in `tests/test_quotes.cpp` with 7 test cases
+- [x] Fixed `expandPath()` to only handle tilde (`~`) expansion, not environment variables
+- [x] All tests passing (10/10) including quote handling integration
+
 ## Security Features
 
 ### DoS Protection
@@ -320,3 +333,58 @@ bg 1                 # Resume job 1 in background
 ls -la | grep txt &  # Run pipeline in background
 jobs                 # View the background pipeline
 ```
+
+---
+
+## Contributing
+
+Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on how to contribute to this project.
+
+### Development Workflow
+
+1. **Fork** the repository
+2. **Clone** your fork locally
+3. **Create** a feature branch (`git checkout -b feature/amazing-feature`)
+4. **Make** your changes with proper tests
+5. **Test** thoroughly (`make test`)
+6. **Format** code (`make format`)
+7. **Commit** with descriptive messages
+8. **Push** to your branch (`git push origin feature/amazing-feature`)
+9. **Open** a Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Contributors
+
+Special thanks to the following people who have contributed to making ninxsh better:
+
+- **[@piotrmaciejbednarski](https://github.com/piotrmaciejbednarski)** - Discovered and reported critical DoS vulnerability in input processing, provided detailed reproduction steps and suggested security improvements that led to the implementation of comprehensive DoS protection in Day 10
+
+*Want to see your name here? Check out our [Contributing Guidelines](CONTRIBUTING.md) and submit a pull request!*
+
+## Acknowledgments
+
+- Built with modern C++17 standards
+- Inspired by traditional Unix shells (bash, zsh, tcsh)
+- Cross-platform compatibility with macOS, Linux, and Windows
+- Comprehensive testing and documentation practices
+
+## Contact & Support
+
+- **Issues**: Report bugs and request features via [GitHub Issues](https://github.com/AarambhaAnta/ninxsh/issues)
+- **Discussions**: Join conversations in [GitHub Discussions](https://github.com/AarambhaAnta/ninxsh/discussions)
+- **Documentation**: Full documentation available in this README and [CONTRIBUTING.md](CONTRIBUTING.md)
+
+---
+
+<div align="center">
+
+**ninxsh** - A modern Unix shell written in C++
+
+⭐ **Star this repo** if you find it useful! ⭐
+
+Built with ❤️ by developers, for developers
+
+</div>

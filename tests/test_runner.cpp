@@ -10,6 +10,7 @@ bool test_io_redirection();
 bool test_pipeline();
 bool test_dos_protection();  // Added for DoS protection tests
 bool test_job_management();  // Added for job management tests
+bool test_quote_handling();  // Added for quote handling tests
 void runHistoryTests();      // Added for history tests
 
 // Main test runner
@@ -36,6 +37,7 @@ int main() {
     RUN_TEST(test_pipeline);
     RUN_TEST(test_dos_protection);
     RUN_TEST(test_job_management);
+    RUN_TEST(test_quote_handling);
 
     // Run history tests (they use their own testing framework)
     std::cout << "Running history tests... " << std::endl;

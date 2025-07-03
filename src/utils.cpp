@@ -36,25 +36,12 @@ std::string expandPath(const std::string& path) {
 
     std::string result = path;
 
-    // Handle tilde expansion
+    // Handle tilde expansion only
     if (!result.empty() && result[0] == '~') {
         const char* home = getenv("HOME");
         if (home) {
             result.replace(0, 1, home);
         }
-    }
-
-    // Quick check: if there's no '$' character, skip expensive regex processing
-    if (result.find('$') == std::string::npos) {
-        return result;
-    }
-
-    // Use static regex pattern (compiled once)
-    std::smatch match;
-
-    while (std::regex_search(result, match, envPattern)) {
-        const char* value = getenv(match[1].str().c_str());
-        result.replace(match.position(0), match.length(0), value ? value : "");
     }
 
     return result;
