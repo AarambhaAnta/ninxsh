@@ -38,5 +38,5 @@ bool executeBuiltin(const std::vector<const char*>& argv) {
 }
 
 bool isBuiltin(const std::string& cmd) {
-    return cmd == "exit" || cmd == "clear" || cmd == "cd";
+    return cmd == "exit" || cmd == "clear" || cmd == "cd" || cmd == "history";
 }
