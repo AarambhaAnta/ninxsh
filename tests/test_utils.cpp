@@ -78,5 +78,45 @@ bool test_utils() {
         }
     }
 
+    // Test 5: Terminal utility functions
+    {
+        try {
+            // Test username function
+            std::string username = getCurrentUsername();
+            if (username.empty()) {
+                std::cerr << "Failed username test - empty result" << std::endl;
+                allTestsPassed = false;
+            }
+
+            // Test hostname function
+            std::string hostname = getCurrentHostname();
+            if (hostname.empty()) {
+                std::cerr << "Failed hostname test - empty result" << std::endl;
+                allTestsPassed = false;
+            }
+
+            // Test current working directory function
+            std::string cwd = getCurrentWorkingDir();
+            if (cwd.empty()) {
+                std::cerr << "Failed cwd test - empty result" << std::endl;
+                allTestsPassed = false;
+            }
+
+            // Test colored prompt generation
+            std::string prompt = getColoredPrompt();
+            if (prompt.empty()) {
+                std::cerr << "Failed prompt test - empty result" << std::endl;
+                allTestsPassed = false;
+            }
+
+            // Test terminal detection function
+            bool isTerminal = isOutputToTerminal();
+            (void)isTerminal;  // Function should not crash
+        } catch (const std::exception& e) {
+            std::cerr << "Failed terminal utility tests - exception: " << e.what() << std::endl;
+            allTestsPassed = false;
+        }
+    }
+
     return allTestsPassed;
 }
