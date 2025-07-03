@@ -7,8 +7,15 @@
 #include <vector>
 
 std::string expandPath(const std::string& path) {
+    // Early validation: reject excessively long paths to prevent DoS
+    const size_t MAX_PATH_LENGTH = 2048;  // Reasonable limit for file paths
+    if (path.length() > MAX_PATH_LENGTH) {
+        return path;  // Return unchanged if too long
+    }
+
     std::string result = path;
 
+    // Handle tilde expansion
     if (!result.empty() && result[0] == '~') {
         const char* home = getenv("HOME");
         if (home) {
@@ -16,6 +23,12 @@ std::string expandPath(const std::string& path) {
         }
     }
 
+    // Quick check: if there's no '$' character, skip expensive regex processing
+    if (result.find('$') == std::string::npos) {
+        return result;
+    }
+
+    // Only perform regex search if string contains '$' and is reasonable length
     std::regex envPattern(R"(\$([A-Za-z_][A-Za-z0-9_]*))");
     std::smatch match;
 
@@ -28,8 +41,19 @@ std::string expandPath(const std::string& path) {
 }
 
 std::string expandEnvVars(const std::string& str) {
+    // Early validation: reject excessively long strings to prevent DoS
+    const size_t MAX_STRING_LENGTH = 2048;
+    if (str.length() > MAX_STRING_LENGTH) {
+        return str;  // Return unchanged if too long
+    }
+
+    // Quick check: if there's no '$' character, skip expensive regex processing
+    if (str.find('$') == std::string::npos) {
+        return str;
+    }
+
     std::string result = str;
-    std::regex envPattern(R"(\$([A-Za-z_][A-Za-z0-0_]*))");
+    std::regex envPattern(R"(\$([A-Za-z_][A-Za-z0-9_]*))");
     std::smatch match;
 
     while (std::regex_search(result, match, envPattern)) {

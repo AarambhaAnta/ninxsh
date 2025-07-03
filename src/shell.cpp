@@ -46,6 +46,21 @@ void Shell::run() {
             continue;
         }
 
+        // If the input was changed by history expansion, echo the command
+        if (expandedInput != input) {
+            std::cout << expandedInput << std::endl;
+            input = expandedInput;
+        }
+
+        // Add command to history
+        history.addCommand(input);
+
+        // Early input validation to prevent DoS attacks
+        const size_t MAX_INPUT_LENGTH = 4096;
+        if (input.length() > MAX_INPUT_LENGTH) {
+            std::cout << "ninxsh: input too long (maximum " << MAX_INPUT_LENGTH << " characters)\n";
+            continue;
+        }
 
         ParsedCommand parsed = parseCommand(input);
 

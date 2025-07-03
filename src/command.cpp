@@ -19,6 +19,14 @@ ParsedCommand::~ParsedCommand() {
 
 ParsedCommand parseCommand(const std::string& input) {
     ParsedCommand result;
+
+    // Early validation: reject excessively long input to prevent DoS
+    const size_t MAX_INPUT_LENGTH = 4096;  // Reasonable limit for command line input
+    if (input.length() > MAX_INPUT_LENGTH) {
+        // Return empty result - caller should handle this as invalid input
+        return result;
+    }
+
     std::vector<std::string> pipeCommands;
 
     // Split the input by pipe character
