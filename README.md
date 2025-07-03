@@ -8,7 +8,7 @@
 `ninxsh` is a lightweight shell written in modern C++. It supports:
 
 - REPL prompt with custom emoji 🔮
-- Builtin Commands (`exit`, `cd`, `clear`)
+- Builtin Commands (`exit`, `cd`, `clear`, `history`)
 - External executable support using `fork()` and `execvp()`
 - Input/output redirection (`<`, `>`)
 - Command pipelines (`|`) with multiple commands
@@ -18,7 +18,7 @@
 - Environment variable expansion (`$HOME`, `$USER`, etc.)
 - Zombie process cleanup
 - Comprehensive test suite for all features
-- Command history (planned)
+- Command history with persistent storage and execution (`!!`, `!n`)
 - Quoting (planned)
 
 ## Build Instructions
@@ -154,3 +154,13 @@ mkdir -p ninxsh/src ninxsh/include \
 - [x] Added signal handling tests
 - [x] Enhanced Makefile with debug/release/sanitize/format targets
 - [x] Added test infrastructure with proper pattern rules
+
+### **Day 9** - Command History
+
+- [x] Implemented `history` command to view command history
+- [x] Store previous commands in memory
+- [x] Save history to `~/.ninxsh_history` file
+- [x] Load history from file when shell starts
+- [x] Automatic cleanup of oldest commands when history size exceeds limit
+- [x] Support for `!!` to execute the last command
+- [x] Support for `!n` to execute command number n from history
