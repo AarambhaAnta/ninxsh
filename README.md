@@ -7,17 +7,18 @@
 
 `ninxsh` is a lightweight shell written in modern C++. It supports:
 
-- REPL prompt with custom emoji 🔮
-- Builtin Commands (`exit`, `cd`, `clear`, `history`, `jobs`, `kill`, `fg`, `bg`)
-- External executable support using `fork()` and `execvp()`
-- Input/output redirection (`<`, `>`)
-- Command pipelines (`|`) with multiple commands
-- Background process execution (`&`)
-- Job control and management (`jobs`, `kill <pid>`, `fg [job_id]`, `bg [job_id]`)
-- Signal handling (Ctrl+C, Ctrl+Z)
-- Path expansion (`~` to home directory)
-- Environment variable expansion (`$HOME`, `$USER`, etc.)
-- Zombie process cleanup with automatic job status updates
+- **Enhanced Terminal Prompt**: Modern `username@hostname:path$` format with ANSI colors
+- **Smart Prompt Display**: Colored prompt for interactive use, plain format when piped
+- **Builtin Commands** (`exit`, `cd`, `clear`, `history`, `jobs`, `kill`, `fg`, `bg`)
+- **External executable support** using `fork()` and `execvp()`
+- **Input/output redirection** (`<`, `>`)
+- **Command pipelines** (`|`) with multiple commands
+- **Background process execution** (`&`)
+- **Job control and management** (`jobs`, `kill <pid>`, `fg [job_id]`, `bg [job_id]`)
+- **Signal handling** (Ctrl+C, Ctrl+Z)
+- **Path expansion** (`~` to home directory)
+- **Environment variable expansion** (`$HOME`, `$USER`, etc.)
+- **Zombie process cleanup** with automatic job status updates
 - DoS protection with configurable limits (centralized in `limits.hpp`)
 - Comprehensive test suite for all features
 - Command history with persistent storage and execution (`!!`, `!n`)

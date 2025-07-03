@@ -10,6 +10,7 @@
 #include "builtin.hpp"
 #include "command.hpp"
 #include "executor.hpp"
+#include "utils.hpp"
 
 Shell::Shell() {
     // Load history from file if available
@@ -211,7 +212,7 @@ void Shell::run() {
 }
 
 void Shell::printPrompt() const {
-    std::cout << "🔮ninxsh > " << std::flush;
+    std::cout << getColoredPrompt() << std::flush;
 }
 
 std::string Shell::expandHistoryCommand(const std::string& input) const {
